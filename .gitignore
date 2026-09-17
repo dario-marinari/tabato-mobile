@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# Cartelle native generate da "npx cap add android" / "npx cap add ios" (vedi README): seguendo
+# la convenzione standard Capacitor vanno COMMITTATE (contengono manifest/progetto Xcode con le
+# personalizzazioni di firma, permessi, ecc.), si escludono solo i rispettivi output di build.
+/android/app/build/
+/android/.gradle/
+/android/local.properties
+/ios/App/Pods/
+/ios/App/output/
+/ios/App/build/

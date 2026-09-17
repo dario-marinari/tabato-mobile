@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TabaTo</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f2fbfc;
+      font-family: "Nunito", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #33302e;
+    }
+    .offline {
+      text-align: center;
+      padding: 24px;
+    }
+    .offline h1 {
+      font-family: "Baloo 2", sans-serif;
+      color: #157f9c;
+    }
+    button {
+      margin-top: 12px;
+      background: #ff8f5e;
+      color: #fff;
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 20px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!--
+    Questa pagina viene mostrata SOLO se il dispositivo non riesce a raggiungere
+    https://www.tabato.it al primo avvio (server.url in capacitor.config.ts): l'app normalmente
+    carica direttamente il sito remoto e non passa mai da qui.
+  -->
+  <div class="offline">
+    <h1>🧸 TabaTo</h1>
+    <p>Impossibile raggiungere tabato.it. Controlla la connessione e riprova.</p>
+    <button onclick="window.location.reload()">Riprova</button>
+  </div>
+</body>
+</html>

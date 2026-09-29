@@ -11,7 +11,11 @@ web non può offrire:
 - **Accesso alla rubrica del telefono**, per la funzione "trova amici" (confronto via hash,
   nessuna email in chiaro lascia il dispositivo).
 - **Notifiche push** (FCM su Android, APNs su iOS).
-- Scansione QR tramite fotocamera nativa (in alternativa a QR letti da altre app).
+- **Scansione QR/codici a barre tramite fotocamera nativa** nel form "Aggiungi un desiderio": un
+  QR con un link riusa l'anteprima prodotto già esistente, un codice a barre (EAN/UPC) riusa la
+  ricerca prodotti online già esistente — entrambe le funzionalità web restano invariate, lo
+  scanner si limita a compilare il campo descrizione come farebbe l'utente digitando o incollando
+  a mano (vedi `native-bridge.js`, funzione `wireBarcodeScan`).
 
 Tutta la UI, l'autenticazione e la logica di business restano nel backend Spring Boot del
 progetto **`tabato-app`** (repository separata). Il ponte JavaScript che questa app usa per
@@ -63,18 +67,38 @@ non conosce a priori quali plugin richiedono quali permessi runtime.
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 ```
 
+Inoltre, dentro il tag `<application>` (richiesto da `@capacitor-mlkit/barcode-scanning` per
+scaricare il modello di riconoscimento ML Kit al primo utilizzo):
+
+```xml
+<meta-data android:name="com.google.mlkit.vision.DEPENDENCIES" android:value="barcode_ui" />
+```
+
+`@capacitor-mlkit/barcode-scanning` richiede inoltre `minSdkVersion = 23` (Capacitor 6 genera di
+default 22): in `android/variables.gradle` aggiornare (o aggiungere, se non già presente) la voce:
+
+```gradle
+ext {
+    minSdkVersion = 23
+    // ... altre voci già generate da "cap add android" restano invariate
+}
+```
+
 ### iOS — `ios/App/App/Info.plist`
 
 ```xml
 <key>NSContactsUsageDescription</key>
 <string>TabaTo usa la rubrica solo per suggerirti quali amici sono già iscritti, tramite un confronto sicuro basato su hash: nessuna email dei tuoi contatti viene inviata in chiaro o salvata.</string>
 <key>NSCameraUsageDescription</key>
-<string>TabaTo usa la fotocamera per inquadrare i QR code delle liste dei desideri.</string>
+<string>TabaTo usa la fotocamera per inquadrare i QR code delle liste dei desideri e per scansionare QR/codici a barre dei prodotti quando aggiungi un desiderio.</string>
 ```
 
 > Il testo esatto delle stringhe `NS*UsageDescription` è quello mostrato all'utente nel dialog di
 > permesso di iOS ed è anche verificato in fase di App Store review: deve descrivere fedelmente
 > l'uso reale (vedi sezione Privacy sotto).
+
+> `@capacitor-mlkit/barcode-scanning` richiede un deployment target iOS minimo 15.5: verificare
+> `platform :ios, '15.5'` (o superiore) in `ios/App/Podfile` dopo `cap add ios`.
 
 ### Firebase Cloud Messaging (push Android)
 

@@ -2,7 +2,7 @@
   "name": "tabato-mobile",
   "version": "1.0.0",
   "private": true,
-  "description": "App Android/iOS di TabaTo: wrapper Capacitor che carica www.tabato.it in una WebView nativa, aggiungendo condivisione nativa, accesso alla rubrica e notifiche push.",
+  "description": "App Android/iOS di TabaTo: wrapper Capacitor che carica www.tabato.it in una WebView nativa, aggiungendo condivisione nativa, accesso alla rubrica, notifiche push e scansione QR/codici a barre.",
   "scripts": {
     "sync": "cap sync",
     "open:android": "cap open android",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@capacitor-community/contacts": "^6.0.0",
+    "@capacitor-mlkit/barcode-scanning": "^6.2.0",
     "@capacitor/android": "^6.1.2",
     "@capacitor/app": "^6.0.1",
     "@capacitor/camera": "^6.0.2",

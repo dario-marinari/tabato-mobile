@@ -12,20 +12,20 @@
     "doctor": "cap doctor"
   },
   "dependencies": {
-    "@capacitor-community/contacts": "^6.0.0",
-    "@capacitor-mlkit/barcode-scanning": "^6.2.0",
-    "@capacitor/android": "^6.1.2",
-    "@capacitor/app": "^6.0.1",
-    "@capacitor/camera": "^6.0.2",
-    "@capacitor/core": "^6.1.2",
-    "@capacitor/ios": "^6.1.2",
-    "@capacitor/push-notifications": "^6.0.2",
-    "@capacitor/share": "^6.0.2",
-    "@capacitor/splash-screen": "^6.0.2"
+    "@capacitor-community/contacts": "^7.2.0",
+    "@capacitor-mlkit/barcode-scanning": "^7.5.0",
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/app": "^7.1.2",
+    "@capacitor/camera": "^7.0.5",
+    "@capacitor/core": "^7.6.9",
+    "@capacitor/ios": "^7.6.9",
+    "@capacitor/push-notifications": "^7.0.7",
+    "@capacitor/share": "^7.0.4",
+    "@capacitor/splash-screen": "^7.0.5"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^6.1.2",
+    "@capacitor/cli": "^7.6.9",
     "typescript": "^5.4.5"
   }
 }

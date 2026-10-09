@@ -32,11 +32,11 @@ token separata dalla sessione web: non giustificato per l'attuale dimensione del
 
 ## Prerequisiti locali (da fare su una macchina con Node.js)
 
-Questo repository contiene solo la configurazione Capacitor (`package.json`,
-`capacitor.config.ts`) e la pagina di fallback offline (`www/index.html`): **non** include le
-cartelle native `android/` e `ios/`, che vanno generate localmente con la CLI Capacitor perché
-richiedono i toolchain nativi (Android Studio / Xcode) non presenti in questo ambiente di
-sviluppo.
+Le cartelle native `android/` e `ios/` sono generate con la CLI Capacitor (`npx cap add
+<platform>`) e **sono committate** in questo repository: la generazione del progetto Xcode/
+Android Studio non richiede i rispettivi IDE installati (solo `cap add`/`cap sync` girano ovunque
+ci sia Node.js), ma build, firma e pubblicazione sì — per iOS questo avviene via CI cloud (vedi
+sezione "Pubblicazione su App Store" più sotto), non serve un Mac fisico.
 
 ```powershell
 # 1. Installa le dipendenze
@@ -139,6 +139,44 @@ plugin): in quel caso serve una nuova build/submission.
       Google Play Console coerentemente con quanto sopra.
 - [ ] Verificare che nessun contatto in chiaro venga mai loggato lato client o server (solo hash).
 
+## Pubblicazione su App Store (senza Mac fisico)
+
+Non possedendo un Mac, la build/firma/upload iOS viene delegata a **Codemagic** (CI cloud con
+runner macOS), configurato in `codemagic.yaml`. Procedura una tantum:
+
+1. **Apple Developer Program** (99 $/anno): iscriversi su https://developer.apple.com/programs/.
+2. **Repo privato** su GitHub/GitLab (solo tu come collaboratore) contenente questo progetto,
+   incluse le cartelle `android/` e `ios/` già generate — collegarlo a Codemagic
+   (https://codemagic.io), piano gratuito (500 min/mese di build macOS).
+3. In App Store Connect (https://appstoreconnect.apple.com):
+   - Creare l'app (bundle ID `it.tabato.app`, nome "TabaTo").
+   - Generare una **API Key** (Users and Access > Integrations > App Store Connect API) con ruolo
+     "App Manager".
+4. In Codemagic (Team settings > Integrations > App Store Connect): incollare la API Key,
+   nominando l'integrazione `tabato_app_store_connect` (nome già referenziato in
+   `codemagic.yaml`).
+5. Aggiornare in `codemagic.yaml` il valore `APP_STORE_APPLE_ID` con l'Apple ID numerico
+   dell'app (visibile in App Store Connect, sezione "App Information").
+6. Lanciare la build creando un tag `ios-<versione>` (es. `ios-1.0.0`): Codemagic compila,
+   firma automaticamente (certificati/profili gestiti dall'integrazione) e carica la build su
+   **TestFlight** (`submit_to_app_store: false` di default — sottomissione a App Store manuale o
+   impostando `submit_to_app_store: true` quando pronti).
+
+Icona App Store e splash screen sono già generate in `ios/App/App/Assets.xcassets/` a partire dal
+master `resources/icon.png` (1024×1024), tramite `npx capacitor-assets generate --ios`: da
+rilanciare solo se l'icona master cambia.
+
+Gli screenshot per App Store Connect (6.9", 1320×2868 px) sono in `store-assets/ios-screenshots/`,
+catturati automaticamente dalle pagine pubbliche del sito (home + lista di esempio) con
+Playwright — nessun login necessario. Per rigenerarli dopo modifiche grafiche al sito:
+`store-assets/ios-screenshots/generate-screenshots.js` (vedi istruzioni in testa al file).
+
+Asset ancora da preparare prima della review pubblica: descrizione/parole chiave, categoria, età
+consigliata e la checklist privacy già elencata sopra. Vedi anche le linee guida Apple 4.2/4.2.3
+(minima funzionalità/"repackaged website"): le funzioni native di questa app (condivisione,
+rubrica, push, scanner fotocamera) vanno evidenziate nelle note al reviewer per giustificare
+l'approvazione.
+
 ## Struttura del repository
 
 ```
@@ -147,6 +185,7 @@ tabato-mobile/
   capacitor.config.ts     ← appId, appName, server.url (punta a www.tabato.it)
   tsconfig.json           ← necessario solo per capacitor.config.ts
   www/index.html          ← pagina di fallback offline (non è la UI dell'app)
-  android/                ← generata con "npx cap add android" (non presente in questo commit)
-  ios/                    ← generata con "npx cap add ios" (non presente in questo commit)
+  android/                ← generata con "npx cap add android"
+  ios/                    ← generata con "npx cap add ios"
+  codemagic.yaml          ← pipeline CI per build/firma/upload iOS su App Store Connect
 ```

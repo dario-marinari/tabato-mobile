@@ -1,0 +1,65 @@
+workflows:
+  ios-release:
+    name: TabaTo iOS - Release (App Store)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      # Nome dell'integrazione App Store Connect configurata in Codemagic UI
+      # (Teams > Integrations > App Store Connect): crea una API Key in
+      # https://appstoreconnect.apple.com/access/api e incollala qui con questo nome.
+      app_store_connect: tabato_app_store_connect
+
+    environment:
+      ios_signing:
+        # Gestione automatica dei certificati/profili di firma da parte di Codemagic,
+        # tramite l'integrazione App Store Connect sopra.
+        distribution_type: app_store
+        bundle_identifier: it.tabato.app
+      vars:
+        APP_STORE_APPLE_ID: 0000000000 # sostituire con l'Apple ID numerico dell'app (App Store Connect)
+      node: latest
+      xcode: latest
+      cocoapods: default
+
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'ios-*'
+          include: true
+
+    scripts:
+      - name: Installa le dipendenze npm
+        script: npm ci
+
+      - name: Sincronizza il progetto Capacitor iOS
+        script: npx cap sync ios
+
+      - name: Installa i CocoaPods
+        script: |
+          cd ios/App && pod install
+
+      - name: Imposta build number da Codemagic
+        script: |
+          cd ios/App
+          agvtool new-version -all $PROJECT_BUILD_NUMBER
+
+      - name: Build e firma automatica (Xcode)
+        script: |
+          xcode-project use-profiles
+          xcode-project build-ipa \
+            --workspace "ios/App/App.xcworkspace" \
+            --scheme "App"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        # Primo invio: solo upload su App Store Connect (TestFlight interno).
+        # Quando l'app sarà pronta per la review pubblica, impostare:
+        #   submit_to_app_store: true
+        submit_to_testflight: true
+        submit_to_app_store: false

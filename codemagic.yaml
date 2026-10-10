@@ -11,15 +11,13 @@ workflows:
 
     environment:
       ios_signing:
-        # Gestione automatica dei certificati/profili di firma da parte di Codemagic,
-        # tramite l'integrazione App Store Connect sopra.
-        # Elenco di tutti i bundle id del progetto (app principale + estensioni):
-        # ognuno deve avere un proprio App ID registrato su Apple Developer Portal
-        # affinche' Codemagic possa generare/scaricare il relativo profilo.
+        # Gestione automatica del certificato + profilo di firma per il target
+        # principale (App), tramite l'integrazione App Store Connect sopra.
+        # NB: questo campo accetta un solo bundle id. Il profilo per il target
+        # ShareExtension viene recuperato esplicitamente nello script di build
+        # qui sotto con "app-store-connect fetch-signing-files".
         distribution_type: app_store
-        bundle_identifier:
-          - it.tabato.app
-          - it.tabato.app.ShareExtension
+        bundle_identifier: it.tabato.app
       vars:
         APP_STORE_APPLE_ID: 6821043787 # Apple ID numerico dell'app (App Store Connect)
       node: latest
@@ -48,6 +46,12 @@ workflows:
         script: |
           cd ios/App
           agvtool new-version -all $PROJECT_BUILD_NUMBER
+
+      - name: Recupera profilo di firma per ShareExtension
+        script: |
+          app-store-connect fetch-signing-files it.tabato.app.ShareExtension \
+            --type IOS_APP_STORE \
+            --create
 
       - name: Build e firma automatica (Xcode)
         script: |

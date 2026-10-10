@@ -55,5 +55,16 @@
 	<string>TabaTo salva nella tua libreria foto le immagini che scegli di scaricare, ad esempio il QR code di una lista.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>it.tabato.app.share</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tabato</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -34,9 +34,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        // Lo Share Extension (foglio "Condividi" di sistema) rimanda il controllo all'app aprendo
+        // lo schema personalizzato "tabato://share-target?text=...": lo intercettiamo qui e carichiamo
+        // direttamente la pagina corrispondente nella WebView di Capacitor, replicando il comportamento
+        // di MainActivity.handleShareIntent() su Android.
+        if url.scheme == "tabato", url.host == "share-target" {
+            handleShareTarget(url)
+            return true
+        }
         // Called when the app was launched with a url. Feel free to add additional processing here,
         // but if you want the App API to support tracking app url opens, make sure to keep this call
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
+    }
+
+    private func handleShareTarget(_ url: URL) {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let sharedText = components.queryItems?.first(where: { $0.name == "text" })?.value,
+              let encodedText = sharedText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let targetURL = URL(string: "https://www.tabato.it/share-target?text=\(encodedText)") else {
+            return
+        }
+        if let bridgeViewController = window?.rootViewController as? CAPBridgeViewController {
+            bridgeViewController.webView?.load(URLRequest(url: targetURL))
+        }
     }
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {

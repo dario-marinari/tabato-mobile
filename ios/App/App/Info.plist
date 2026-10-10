@@ -53,5 +53,7 @@
 	<string>TabaTo accede alle tue foto per permetterti di scegliere un'immagine da allegare a un desiderio o da usare come immagine del profilo.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>TabaTo salva nella tua libreria foto le immagini che scegli di scaricare, ad esempio il QR code di una lista.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

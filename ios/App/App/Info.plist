@@ -49,5 +49,9 @@
 	<string>TabaTo usa la rubrica solo per suggerirti quali amici sono già iscritti, tramite un confronto sicuro basato su hash: nessuna email dei tuoi contatti viene inviata in chiaro o salvata.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>TabaTo usa la fotocamera per inquadrare i QR code delle liste dei desideri e per scansionare QR/codici a barre dei prodotti quando aggiungi un desiderio.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TabaTo accede alle tue foto per permetterti di scegliere un'immagine da allegare a un desiderio o da usare come immagine del profilo.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>TabaTo salva nella tua libreria foto le immagini che scegli di scaricare, ad esempio il QR code di una lista.</string>
 </dict>
 </plist>

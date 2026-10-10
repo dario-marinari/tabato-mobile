@@ -13,8 +13,13 @@ workflows:
       ios_signing:
         # Gestione automatica dei certificati/profili di firma da parte di Codemagic,
         # tramite l'integrazione App Store Connect sopra.
+        # Elenco di tutti i bundle id del progetto (app principale + estensioni):
+        # ognuno deve avere un proprio App ID registrato su Apple Developer Portal
+        # affinche' Codemagic possa generare/scaricare il relativo profilo.
         distribution_type: app_store
-        bundle_identifier: it.tabato.app
+        bundle_identifier:
+          - it.tabato.app
+          - it.tabato.app.ShareExtension
       vars:
         APP_STORE_APPLE_ID: 6821043787 # Apple ID numerico dell'app (App Store Connect)
       node: latest

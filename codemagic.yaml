@@ -17,6 +17,18 @@ workflows:
       # Gestiamo quindi manualmente certificato/profili per ENTRAMBI i
       # target (App + ShareExtension) nello stesso script, cosi' il
       # certificato viene creato/riusato in un'unica sessione keychain.
+      #
+      # IMPORTANTE: la variabile segreta CERTIFICATE_PRIVATE_KEY_B64 (gruppo
+      # "ios_signing", definita in App settings > Environment variables)
+      # DEVE contenere la chiave privata RSA stabile codificata in BASE64
+      # SU UNA SOLA RIGA (non la chiave PEM multilinea grezza: incollata
+      # multilinea in un campo della UI rischia di perdere gli "a capo" e
+      # corrompersi silenziosamente, facendo ripiombare nello stesso
+      # errore "Cannot save Signing Certificates without certificate
+      # private key"). Lo script sottostante la decodifica in un file
+      # temporaneo e lo passa esplicitamente con --certificate-key.
+      groups:
+        - ios_signing
       vars:
         APP_STORE_APPLE_ID: 6821043787 # Apple ID numerico dell'app (App Store Connect)
       node: latest
@@ -52,16 +64,28 @@ workflows:
 
       - name: Recupera certificato e profili di firma (App + ShareExtension)
         script: |
+          # Decodifica la chiave privata RSA stabile (base64 su una riga,
+          # vedi env var CERTIFICATE_PRIVATE_KEY_B64) in un file temporaneo,
+          # cosi' da passarla esplicitamente con --certificate-key invece di
+          # affidarsi alla lettura automatica della env var (che e' fragile
+          # se la chiave PEM multilinea viene incollata/alterata nella UI).
+          CERT_KEY_PATH="$FCI_BUILD_DIR/ios_distribution_private_key.pem"
+          echo "$CERTIFICATE_PRIVATE_KEY_B64" | base64 --decode > "$CERT_KEY_PATH"
+
           # Entrambi i bundle id vengono risolti nella STESSA sessione:
           # se serve un nuovo certificato di distribuzione viene creato
           # una sola volta qui, e la sua chiave privata resta disponibile
           # per il passo successivo (keychain add-certificates).
           app-store-connect fetch-signing-files it.tabato.app \
             --type IOS_APP_STORE \
+            --certificate-key "@file:$CERT_KEY_PATH" \
             --create
           app-store-connect fetch-signing-files it.tabato.app.ShareExtension \
             --type IOS_APP_STORE \
+            --certificate-key "@file:$CERT_KEY_PATH" \
             --create
+
+          rm -f "$CERT_KEY_PATH"
 
       - name: Aggiungi il certificato al keychain di sistema
         script: |

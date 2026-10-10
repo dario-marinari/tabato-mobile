@@ -10,14 +10,13 @@ workflows:
       app_store_connect: tabato_app_store_connect
 
     environment:
-      ios_signing:
-        # Gestione automatica del certificato + profilo di firma per il target
-        # principale (App), tramite l'integrazione App Store Connect sopra.
-        # NB: questo campo accetta un solo bundle id. Il profilo per il target
-        # ShareExtension viene recuperato esplicitamente nello script di build
-        # qui sotto con "app-store-connect fetch-signing-files".
-        distribution_type: app_store
-        bundle_identifier: it.tabato.app
+      # NB: la firma NON usa il blocco dichiarativo "ios_signing" perché
+      # accetta un solo bundle id e andrebbe in conflitto con il fetch
+      # manuale del profilo per la ShareExtension (causa dell'errore
+      # "Cannot save Signing Certificates without certificate private key").
+      # Gestiamo quindi manualmente certificato/profili per ENTRAMBI i
+      # target (App + ShareExtension) nello stesso script, cosi' il
+      # certificato viene creato/riusato in un'unica sessione keychain.
       vars:
         APP_STORE_APPLE_ID: 6821043787 # Apple ID numerico dell'app (App Store Connect)
       node: latest
@@ -47,13 +46,28 @@ workflows:
           cd ios/App
           agvtool new-version -all $PROJECT_BUILD_NUMBER
 
-      - name: Recupera profilo di firma per ShareExtension
+      - name: Inizializza il keychain per la firma del codice
         script: |
+          keychain initialize
+
+      - name: Recupera certificato e profili di firma (App + ShareExtension)
+        script: |
+          # Entrambi i bundle id vengono risolti nella STESSA sessione:
+          # se serve un nuovo certificato di distribuzione viene creato
+          # una sola volta qui, e la sua chiave privata resta disponibile
+          # per il passo successivo (keychain add-certificates).
+          app-store-connect fetch-signing-files it.tabato.app \
+            --type IOS_APP_STORE \
+            --create
           app-store-connect fetch-signing-files it.tabato.app.ShareExtension \
             --type IOS_APP_STORE \
             --create
 
-      - name: Build e firma automatica (Xcode)
+      - name: Aggiungi il certificato al keychain di sistema
+        script: |
+          keychain add-certificates
+
+      - name: Build e firma (Xcode)
         script: |
           xcode-project use-profiles
           xcode-project build-ipa \

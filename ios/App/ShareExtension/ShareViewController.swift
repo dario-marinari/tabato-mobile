@@ -13,6 +13,15 @@ class ShareViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor(red: 0.949, green: 0.984, blue: 0.988, alpha: 1)
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        spinner.startAnimating()
+        view.addSubview(spinner)
+        NSLayoutConstraint.activate([
+            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
         extractSharedText { [weak self] text in
             DispatchQueue.main.async {
                 self?.openHostApp(with: text)
@@ -59,15 +68,27 @@ class ShareViewController: UIViewController {
         // extensionContext.open(_:) funziona solo per i widget "Oggi", non per le estensioni
         // "Condividi": qui il sistema lo ignora in silenzio. Il metodo che funziona è risalire la
         // responder chain fino a UIApplication e chiamare open(_:options:completionHandler:).
+        // Da iOS 18 il vecchio "openURL:" non apre più nulla: serve la variante con options.
         var responder: UIResponder? = self
-        let selector = sel_registerName("openURL:")
+        let legacy = sel_registerName("openURL:")
+        let modern = sel_registerName("openURL:options:completionHandler:")
         while let current = responder {
-            if current.responds(to: selector), current is UIApplication {
-                _ = current.perform(selector, with: url)
+            if current is UIApplication {
+                if current.responds(to: modern) {
+                    typealias OpenFn = @convention(c) (AnyObject, Selector, URL, [UIApplication.OpenExternalURLOptionsKey: Any], ((Bool) -> Void)?) -> Void
+                    let imp = current.method(for: modern)
+                    let fn = unsafeBitCast(imp, to: OpenFn.self)
+                    fn(current, modern, url, [:], nil)
+                } else if current.responds(to: legacy) {
+                    _ = current.perform(legacy, with: url)
+                }
                 break
             }
             responder = current.next
         }
-        extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+        // Lascia al sistema il tempo di avviare l'app prima di chiudere l'estensione.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+            self?.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+        }
     }
 }

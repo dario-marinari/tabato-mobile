@@ -8,6 +8,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        // Stesso colore di sfondo della WebView (vedi MainViewController.swift): evita un flash
+        // nero anche nelle transizioni gestite a livello di finestra (es. foreground/background).
+        window?.backgroundColor = UIColor(red: 0xf2 / 255.0, green: 0xfb / 255.0, blue: 0xfc / 255.0, alpha: 1.0)
         return true
     }
 

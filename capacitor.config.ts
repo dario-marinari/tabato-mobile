@@ -14,6 +14,11 @@ const config: CapacitorConfig = {
   appId: 'it.tabato.app',
   appName: 'TabaTo',
   webDir: 'www',
+  // Colore di sfondo nativo della WebView (sotto la pagina web, visibile per una frazione di
+  // secondo durante il caricamento/transizione tra pagine, dato che ogni "menu" è una navigazione
+  // server-side completa e non una SPA): deve combaciare con lo sfondo del sito per evitare un
+  // flash nero/bianco. Vedi anche MainViewController.swift (iOS) e MainActivity.java (Android).
+  backgroundColor: '#f2fbfc',
   server: {
     // Punta sempre al sito di produzione: nessun asset web viene distribuito con l'app, quindi
     // un aggiornamento del sito è visibile agli utenti mobile senza dover ripubblicare l'app

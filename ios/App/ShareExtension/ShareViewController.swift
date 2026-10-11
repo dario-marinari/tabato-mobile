@@ -21,17 +21,22 @@ class ShareViewController: UIViewController {
     }
 
     private func extractSharedText(completion: @escaping (String?) -> Void) {
-        guard let item = extensionContext?.inputItems.first as? NSExtensionItem,
-              let provider = item.attachments?.first else {
-            completion(nil)
-            return
-        }
+        // Alcune app (es. Amazon) condividono più allegati, e non sempre il primo è quello utile:
+        // si cerca prima un URL e, in sua assenza, un testo, fra tutti gli allegati.
+        let providers = (extensionContext?.inputItems as? [NSExtensionItem] ?? [])
+            .flatMap { $0.attachments ?? [] }
 
-        if provider.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
+        if let provider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.url.identifier) }) {
             provider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { data, _ in
-                completion((data as? URL)?.absoluteString)
+                if let url = data as? URL {
+                    completion(url.absoluteString)
+                } else if let text = data as? String {
+                    completion(text)
+                } else {
+                    completion(nil)
+                }
             }
-        } else if provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier) {
+        } else if let provider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.plainText.identifier) }) {
             provider.loadItem(forTypeIdentifier: UTType.plainText.identifier, options: nil) { data, _ in
                 completion(data as? String)
             }
@@ -41,17 +46,28 @@ class ShareViewController: UIViewController {
     }
 
     private func openHostApp(with sharedText: String?) {
-        defer {
-            extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
-        }
+        // Esclude & + = # ecc. dal testo, altrimenti l'URL condiviso (con query string) verrebbe
+        // troncato quando viene riletto come parametro "text".
+        var allowed = CharacterSet.urlQueryAllowed
+        allowed.remove(charactersIn: "&+=#?/:")
         guard let sharedText = sharedText,
-              let encodedText = sharedText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let encodedText = sharedText.addingPercentEncoding(withAllowedCharacters: allowed),
               let url = URL(string: "tabato://share-target?text=\(encodedText)") else {
+            extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
             return
         }
-        // Le estensioni "Condividi" girano in un processo separato dall'app principale: il modo
-        // supportato da Apple per rimandare il controllo all'app è extensionContext.open(_:), che
-        // chiude l'estensione e chiede al sistema di aprire l'URL (schema personalizzato) nell'app.
-        extensionContext?.open(url, completionHandler: nil)
+        // extensionContext.open(_:) funziona solo per i widget "Oggi", non per le estensioni
+        // "Condividi": qui il sistema lo ignora in silenzio. Il metodo che funziona è risalire la
+        // responder chain fino a UIApplication e chiamare open(_:options:completionHandler:).
+        var responder: UIResponder? = self
+        let selector = sel_registerName("openURL:")
+        while let current = responder {
+            if current.responds(to: selector), current is UIApplication {
+                _ = current.perform(selector, with: url)
+                break
+            }
+            responder = current.next
+        }
+        extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
     }
 }

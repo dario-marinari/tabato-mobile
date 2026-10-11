@@ -50,15 +50,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
 
-    private func handleShareTarget(_ url: URL) {
+    private func handleShareTarget(_ url: URL, attempt: Int = 0) {
+        var allowed = CharacterSet.urlQueryAllowed
+        allowed.remove(charactersIn: "&+=#?/:")
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               let sharedText = components.queryItems?.first(where: { $0.name == "text" })?.value,
-              let encodedText = sharedText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let encodedText = sharedText.addingPercentEncoding(withAllowedCharacters: allowed),
               let targetURL = URL(string: "https://www.tabato.it/share-target?text=\(encodedText)") else {
             return
         }
-        if let bridgeViewController = window?.rootViewController as? CAPBridgeViewController {
-            bridgeViewController.webView?.load(URLRequest(url: targetURL))
+        if let bridgeViewController = window?.rootViewController as? CAPBridgeViewController,
+           let webView = bridgeViewController.webView {
+            webView.load(URLRequest(url: targetURL))
+        } else if attempt < 10 {
+            // Avvio a freddo: la WebView di Capacitor potrebbe non essere ancora pronta.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.handleShareTarget(url, attempt: attempt + 1)
+            }
         }
     }
 

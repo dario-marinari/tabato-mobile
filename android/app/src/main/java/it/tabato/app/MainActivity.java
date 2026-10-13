@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.CookieManager;
 
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -37,6 +38,23 @@ public class MainActivity extends BridgeActivity {
     public void onResume() {
         super.onResume();
         applyDarkSystemBarIcons();
+    }
+
+    /**
+     * La WebView salva i cookie su disco solo periodicamente: se l'app viene chiusa subito dopo il
+     * login, il cookie "Ricordami" andrebbe perso e al riavvio verrebbe richiesto di nuovo l'accesso.
+     * Il flush esplicito quando l'app esce dal primo piano lo rende persistente.
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        CookieManager.getInstance().flush();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        CookieManager.getInstance().flush();
     }
 
     private void applyDarkSystemBarIcons() {

@@ -18,9 +18,18 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- Compare tra le destinazioni del foglio di condivisione di sistema (es. quando si
-                 condivide un link prodotto dall'app Amazon): vedi MainActivity per come il testo
-                 condiviso viene inoltrato alla pagina web "/share-target". -->
+        </activity>
+
+        <!-- Compare tra le destinazioni del foglio di condivisione di sistema (es. quando si
+             condivide un link prodotto dall'app Amazon): inoltra il testo a MainActivity in un
+             task separato, vedi ShareReceiverActivity e MainActivity#handleShareIntent. -->
+        <activity
+            android:name=".ShareReceiverActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />

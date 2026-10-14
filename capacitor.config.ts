@@ -32,7 +32,10 @@ const config: CapacitorConfig = {
       'tabato.it',
       'accounts.google.com',
       'www.facebook.com',
-      'm.facebook.com'
+      'm.facebook.com',
+      'appleid.apple.com',
+      'idmsa.apple.com',
+      '*.apple.com'
     ]
   },
   ios: {

@@ -21,7 +21,8 @@
     "@capacitor/ios": "^7.6.9",
     "@capacitor/push-notifications": "^7.0.7",
     "@capacitor/share": "^7.0.4",
-    "@capacitor/splash-screen": "^7.0.5"
+    "@capacitor/splash-screen": "^7.0.5",
+    "@capgo/capacitor-social-login": "^7.20.0"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",

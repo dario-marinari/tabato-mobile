@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TabaTo - Nessuna connessione</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: #f2fbfc;
+      font-family: "Nunito", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #33302e;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .offline {
+      text-align: center;
+      padding: 32px 24px;
+      max-width: 340px;
+    }
+    .icon {
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 6px 20px rgba(21, 127, 156, .15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon svg {
+      width: 44px;
+      height: 44px;
+      fill: none;
+      stroke: #157f9c;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.4rem;
+      color: #157f9c;
+    }
+    p {
+      margin: 0 0 24px;
+      line-height: 1.5;
+      color: #5b5754;
+    }
+    button {
+      background: #ff8f5e;
+      color: #fff;
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 28px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!--
+    Pagina mostrata da Capacitor (server.errorPath in capacitor.config.ts) quando la WebView
+    non riesce a caricare il sito remoto, ad esempio senza connessione a internet.
+  -->
+  <div class="offline">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M2 8.8a15 15 0 0 1 20 0"/>
+        <path d="M5 12.5a10 10 0 0 1 14 0"/>
+        <path d="M8.5 16a5 5 0 0 1 7 0"/>
+        <circle cx="12" cy="19.5" r=".8"/>
+        <path d="M3 3l18 18"/>
+      </svg>
+    </div>
+    <h1>Nessuna connessione</h1>
+    <p>Non riusciamo a raggiungere TabaTo. Controlla la connessione a internet e riprova.</p>
+    <button type="button" onclick="window.location.href = 'https://www.tabato.it/'">Riprova</button>
+  </div>
+</body>
+</html>

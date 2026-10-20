@@ -25,6 +25,9 @@ const config: CapacitorConfig = {
     // (eccetto per cambi che richiedano nuovi permessi/plugin nativi).
     url: 'https://www.tabato.it',
     androidScheme: 'https',
+    // Pagina locale (www/offline.html) mostrata al posto dell'errore di sistema
+    // "Pagina web non disponibile" quando il sito non è raggiungibile (es. senza internet).
+    errorPath: 'offline.html',
     // Consente la navigazione the-loop verso i domini usati per share/login OAuth2 (Google/Facebook)
     // senza uscire dalla WebView dell'app; aggiornare se cambia il dominio del backend.
     allowNavigation: [

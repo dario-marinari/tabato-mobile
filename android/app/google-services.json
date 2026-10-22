@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "000000000000",
-    "project_id": "tabato-local-dev-dummy",
-    "storage_bucket": "tabato-local-dev-dummy.appspot.com"
+    "project_number": "306363186785",
+    "project_id": "tabato-e09c2",
+    "storage_bucket": "tabato-e09c2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "mobilesdk_app_id": "1:306363186785:android:2976b636127c34afc03420",
         "android_client_info": {
           "package_name": "it.tabato.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDUMMYDUMMYDUMMYDUMMYDUMMYDUMMYDUM"
+          "current_key": "AIzaSyDTlj40176b50RrhDQ-y1j54ZAXSQnPSHg"
         }
       ],
       "services": {

@@ -109,11 +109,19 @@ ext {
 
 ### Apple Push Notification service (push iOS)
 
-1. Generare la chiave APNs (o certificato) nel portale Apple Developer.
-2. Abilitare la capability "Push Notifications" nel target Xcode.
-3. Configurare l'invio dal backend (`tabato-app`) verso APNs quando sarà implementato l'invio
-   effettivo delle notifiche (oggi `PushTokenService` registra solo i token, non invia ancora
-   notifiche: è il punto di partenza per quello sviluppo futuro).
+1. Generare la chiave APNs (Apple Developer → Keys, Sandbox & Production, Team Scoped) e
+   caricarla in Firebase → Cloud Messaging → app iOS (righe sviluppo e produzione), con Key ID
+   e Team ID. L'App ID `it.tabato.app` deve avere "Push Notifications" abilitato.
+2. Senza Xcode, la configurazione nativa è già nel progetto (modificata a mano):
+   - `ios/App/App/GoogleService-Info.plist` (referenziato in `project.pbxproj`);
+   - `ios/App/App/App.entitlements` con `aps-environment`, impostato in `CODE_SIGN_ENTITLEMENTS`;
+   - `UIBackgroundModes` → `remote-notification` in `Info.plist`;
+   - `pod 'FirebaseMessaging'` nel `Podfile` (Codemagic esegue `pod install`);
+   - `AppDelegate.swift`: `FirebaseApp.configure()` e inoltro al plugin del token **FCM** (il
+     plugin di default restituirebbe il token APNs grezzo, inutilizzabile via FCM).
+3. L'invio è implementato nel backend (`FcmPushSender` in `tabato-app`, attivo con
+   `APP_PUSH_FCM_CREDENTIALS_PATH`); vedi il README di `tabato-app`, sezione "Segui lista e
+   notifiche push".
 
 ## Come funziona il bridge lato web
 

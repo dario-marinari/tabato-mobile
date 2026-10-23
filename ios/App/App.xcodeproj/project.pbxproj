@@ -243,6 +243,7 @@
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
 				FACEFEED1000000000000001 /* GoogleService-Info.plist in Resources */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FACEFEED0000000000000009 /* Resources */ = {

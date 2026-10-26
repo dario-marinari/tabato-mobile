@@ -19,13 +19,13 @@ def capacitor_pods
   pod 'CapacitorShare', :path => '../../node_modules/@capacitor/share'
   pod 'CapacitorSplashScreen', :path => '../../node_modules/@capacitor/splash-screen'
   pod 'CapgoCapacitorSocialLogin', :path => '../../node_modules/@capgo/capacitor-social-login'
-  # Necessario per ottenere il token FCM (il backend invia le push tramite Firebase).
-  pod 'FirebaseMessaging'
 end
 
 target 'App' do
   capacitor_pods
-  # Add your Pods here
+  # Necessario per ottenere il token FCM (il backend invia le push tramite Firebase).
+  # Va qui e non in capacitor_pods: "cap sync" riscrive quel blocco e rimuoverebbe il pod.
+  pod 'FirebaseMessaging'
 end
 
 post_install do |installer|

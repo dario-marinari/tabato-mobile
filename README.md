@@ -116,7 +116,9 @@ ext {
    - `ios/App/App/GoogleService-Info.plist` (referenziato in `project.pbxproj`);
    - `ios/App/App/App.entitlements` con `aps-environment`, impostato in `CODE_SIGN_ENTITLEMENTS`;
    - `UIBackgroundModes` → `remote-notification` in `Info.plist`;
-   - `pod 'FirebaseMessaging'` nel `Podfile` (Codemagic esegue `pod install`);
+   - `pod 'FirebaseMessaging'` nel `Podfile`, **dentro `target 'App'`** e non in `capacitor_pods`
+     (`npx cap sync ios` riscrive quel blocco e rimuoverebbe il pod: errore "unable to resolve
+     module dependency: 'FirebaseCore'"); Codemagic esegue poi `pod install`;
    - `AppDelegate.swift`: `FirebaseApp.configure()` e inoltro al plugin del token **FCM** (il
      plugin di default restituirebbe il token APNs grezzo, inutilizzabile via FCM).
 3. L'invio è implementato nel backend (`FcmPushSender` in `tabato-app`, attivo con

@@ -46,7 +46,7 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
 	<key>NSContactsUsageDescription</key>
-	<string>TabaTo usa la rubrica solo per suggerirti quali amici sono già iscritti, tramite un confronto sicuro basato su hash: nessuna email dei tuoi contatti viene inviata in chiaro o salvata.</string>
+	<string>TabaTo usa la rubrica solo per suggerirti quali amici sono già iscritti, confrontando email e numeri di telefono in forma cifrata (hash): nessun recapito dei tuoi contatti viene inviato in chiaro o salvato.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>TabaTo usa la fotocamera per inquadrare i QR code delle liste dei desideri e per scansionare QR/codici a barre dei prodotti quando aggiungi un desiderio.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

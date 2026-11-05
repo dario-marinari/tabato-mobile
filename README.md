@@ -8,8 +8,8 @@ web non può offrire:
 - **Condivisione nativa** (foglio di sistema Android/iOS), che a differenza dei link web
   `sharer.php` / `wa.me` include anche le voci "Aggiungi al tuo Stato" (WhatsApp) e "Aggiungi
   alla tua Storia" (Facebook/Instagram).
-- **Accesso alla rubrica del telefono**, per la funzione "trova amici" (confronto via hash,
-  nessuna email in chiaro lascia il dispositivo).
+- **Accesso alla rubrica del telefono**, per la funzione "trova amici": il confronto avviene su
+  hash SHA-256 di email **e numeri di telefono**, nessun recapito in chiaro lascia il dispositivo.
 - **Notifiche push** (FCM su Android, APNs su iOS).
 - **Scansione QR/codici a barre tramite fotocamera nativa** nel form "Aggiungi un desiderio": un
   QR con un link riusa l'anteprima prodotto già esistente, un codice a barre (EAN/UPC) riusa la
@@ -88,7 +88,7 @@ ext {
 
 ```xml
 <key>NSContactsUsageDescription</key>
-<string>TabaTo usa la rubrica solo per suggerirti quali amici sono già iscritti, tramite un confronto sicuro basato su hash: nessuna email dei tuoi contatti viene inviata in chiaro o salvata.</string>
+<string>TabaTo usa la rubrica solo per suggerirti quali amici sono già iscritti, confrontando email e numeri di telefono in forma cifrata (hash): nessun recapito dei tuoi contatti viene inviato in chiaro o salvato.</string>
 <key>NSCameraUsageDescription</key>
 <string>TabaTo usa la fotocamera per inquadrare i QR code delle liste dei desideri e per scansionare QR/codici a barre dei prodotti quando aggiungi un desiderio.</string>
 ```
@@ -133,7 +133,10 @@ Le pagine di `tabato-app` includono sempre
 1. Rileva `window.Capacitor` (presente solo dentro questa app, mai nel browser normale).
 2. Sostituisce i pulsanti di condivisione web con il foglio di condivisione nativo
    (`data-native-share` in `list-manage.html`).
-3. Espone `window.tabatoFindFriendsFromContacts()` per la ricerca amici via rubrica.
+3. Espone `window.tabatoFindFriendsFromContacts()` per la ricerca amici via rubrica, leggendo sia
+   le email sia i numeri di telefono dei contatti e inviandone solo gli hash SHA-256. La
+   normalizzazione E.164 dei numeri (`normalizePhone()`) deve restare identica a quella di
+   `PhoneHashing.normalize()` lato server: se divergono, i match spariscono senza errori visibili.
 4. Registra il token push al primo avvio, se l'utente è autenticato.
 
 Nessuna pagina HTML/CSS di questa app: tutta la UI resta quella servita da `tabato-app`, quindi
@@ -143,10 +146,13 @@ plugin): in quel caso serve una nuova build/submission.
 
 ## Privacy — checklist prima della pubblicazione sugli store
 
-- [ ] Aggiornare `privacy.html` in `tabato-app` con una sezione dedicata su: accesso rubrica,
+- [x] Aggiornare `privacy.html` in `tabato-app` con una sezione dedicata su: accesso rubrica,
       finalità (trova amici), hashing SHA-256 lato client, nessuna condivisione con terzi.
+      → sezione *«Ricerca di amici dalla rubrica (solo app)»*, aggiornata al 30 ottobre 2026 con
+      il trattamento anche dei numeri di telefono.
 - [ ] Compilare il questionario "App Privacy" di App Store Connect e la sezione "Data safety" di
-      Google Play Console coerentemente con quanto sopra.
+      Google Play Console coerentemente con quanto sopra. **Il numero di telefono va dichiarato**
+      fra i dati raccolti (facoltativo, finalità "funzionalità dell'app", collegato all'identità).
 - [ ] Verificare che nessun contatto in chiaro venga mai loggato lato client o server (solo hash).
 
 ## Pubblicazione su App Store (senza Mac fisico)

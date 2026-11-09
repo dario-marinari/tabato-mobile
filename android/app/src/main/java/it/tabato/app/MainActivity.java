@@ -31,7 +31,11 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         applySystemBarInsets();
-        handleShareIntent(getIntent());
+        // Su ricreazione dell'activity (processo terminato, rotazione) l'intent SEND originale è ancora
+        // presente: rielaborarlo riaprirebbe la scelta della lista.
+        if (savedInstanceState == null) {
+            handleShareIntent(getIntent());
+        }
     }
 
     @Override
@@ -101,6 +105,9 @@ public class MainActivity extends BridgeActivity {
         if (sharedText == null || sharedText.trim().isEmpty()) {
             return;
         }
+        // Intent consumato: non deve essere rielaborato a una successiva riapertura.
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.removeExtra(Intent.EXTRA_TEXT);
         String targetUrl = "https://www.tabato.it/share-target?text=" + Uri.encode(sharedText.trim());
         getBridge().getWebView().loadUrl(targetUrl);
     }

@@ -75,7 +75,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
+    private func loadInWebView(_ url: URL, attempt: Int = 0) {
+        if let bridgeViewController = window?.rootViewController as? CAPBridgeViewController,
+           let webView = bridgeViewController.webView {
+            webView.load(URLRequest(url: url))
+        } else if attempt < 10 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.loadInWebView(url, attempt: attempt + 1)
+            }
+        }
+    }
+
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        // Universal Link (es. conferma email): carica la pagina nella WebView invece di lasciarla al browser.
+        if userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+           let url = userActivity.webpageURL, url.host == "www.tabato.it" {
+            loadInWebView(url)
+            return true
+        }
         // Called when the app was launched with an activity, including Universal Links.
         // Feel free to add additional processing here, but if you want the App API to support
         // tracking app url opens, make sure to keep this call

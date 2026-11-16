@@ -35,6 +35,7 @@ public class MainActivity extends BridgeActivity {
         // presente: rielaborarlo riaprirebbe la scelta della lista.
         if (savedInstanceState == null) {
             handleShareIntent(getIntent());
+            handleViewIntent(getIntent());
         }
     }
 
@@ -95,6 +96,21 @@ public class MainActivity extends BridgeActivity {
         super.onNewIntent(intent);
         setIntent(intent);
         handleShareIntent(intent);
+        handleViewIntent(intent);
+    }
+
+    /** Carica nella WebView i link https://www.tabato.it/... ricevuti come App Link (es. conferma email). */
+    private void handleViewIntent(Intent intent) {
+        if (intent == null || !Intent.ACTION_VIEW.equals(intent.getAction())) {
+            return;
+        }
+        Uri data = intent.getData();
+        if (data == null || !"https".equals(data.getScheme()) || !"www.tabato.it".equals(data.getHost())) {
+            return;
+        }
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.setData(null);
+        getBridge().getWebView().loadUrl(data.toString());
     }
 
     private void handleShareIntent(Intent intent) {

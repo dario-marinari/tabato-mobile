@@ -20,6 +20,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Link del sito (conferma email, reset password, link di accesso via email) aperti
+                 direttamente nell'app invece che nel browser. Richiede /.well-known/assetlinks.json
+                 sul sito (App Links verificati). -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="www.tabato.it" android:pathPrefix="/verify-email" />
+                <data android:scheme="https" android:host="www.tabato.it" android:pathPrefix="/reset-password" />
+                <data android:scheme="https" android:host="www.tabato.it" android:pathPrefix="/login/link" />
+            </intent-filter>
         </activity>
 
         <!-- Compare tra le destinazioni del foglio di condivisione di sistema (es. quando si
